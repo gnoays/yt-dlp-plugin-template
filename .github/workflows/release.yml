@@ -15,12 +15,12 @@ jobs:
       contents: write  # create the GitHub release
       id-token: write  # PyPI Trusted Publishing
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.2
       - run: uv build
       # Drop-in zip for standalone yt-dlp users (conventional release asset for plugins)
       - run: zip -r "dist/${GITHUB_REPOSITORY#*/}.zip" yt_dlp_plugins -x '*__pycache__*'
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           files: dist/*
           generate_release_notes: true

@@ -5,7 +5,7 @@ name: Release
 
 on:
   push:
-    tags: ['v*']
+    tags: ['v[0-9]+.[0-9]+.[0-9]+']
 
 jobs:
   release:
@@ -15,12 +15,17 @@ jobs:
       contents: write  # create the GitHub release
       id-token: write  # PyPI Trusted Publishing
     steps:
-      - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v10.3.2
+      # Actions are pinned to commit SHAs; Dependabot keeps them up to date
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e  # v10.3.2
+      - name: Check that the tag matches the version in pyproject.toml
+        run: test "${GITHUB_REF_NAME#v}" = "$(uv version --short)"
       - run: uv build
       # Drop-in zip for standalone yt-dlp users (conventional release asset for plugins)
       - run: zip -r "dist/${GITHUB_REPOSITORY#*/}.zip" yt_dlp_plugins -x '*__pycache__*'
-      - uses: softprops/action-gh-release@v3
+      - uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64  # v3.0.3
         with:
           files: dist/*
           generate_release_notes: true
